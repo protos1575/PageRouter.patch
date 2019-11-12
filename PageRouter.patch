@@ -1,0 +1,46 @@
+Index: public/typo3/sysext/core/Classes/Routing/PageRouter.php
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- public/typo3/sysext/core/Classes/Routing/PageRouter.php	(date 1573487360406)
++++ public/typo3/sysext/core/Classes/Routing/PageRouter.php	(date 1573487360406)
+@@ -332,6 +332,23 @@
+         return $uri;
+     }
+ 
++    /**
++     * Get all uids below given page uid
++     *
++     * @param $pageUID
++     * @return string
++     */
++
++    private function getRecursivePageUIDs($pageUID)
++    {
++        $depth = 999999;
++        $queryGenerator = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Database\\QueryGenerator');
++        $rGetTreeList = $queryGenerator->getTreeList($pageUID, $depth, 0, 1);
++        //Will be a string
++        return explode(',', $rGetTreeList);
++
++    }
++
+     /**
+      * Check for records in the database which matches one of the slug candidates.
+      *
+@@ -350,11 +367,13 @@
+             ->removeAll()
+             ->add(GeneralUtility::makeInstance(DeletedRestriction::class))
+             ->add(GeneralUtility::makeInstance(FrontendWorkspaceRestriction::class, null, null, $searchLiveRecordsOnly));
+-
++        //restrict query to sites in rootline
++        $uids = $this->getRecursivePageUIDs($this->site->getRootPageId());
+         $statement = $queryBuilder
+             ->select('uid', 'l10n_parent', 'pid', 'slug')
+             ->from('pages')
+             ->where(
++                $queryBuilder->expr()->in('uid',$uids),
+                 $queryBuilder->expr()->eq(
+                     'sys_language_uid',
+                     $queryBuilder->createNamedParameter($languageId, \PDO::PARAM_INT)
