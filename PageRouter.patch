@@ -3,9 +3,9 @@ IDEA additional info:
 Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 <+>UTF-8
 ===================================================================
---- public/typo3/sysext/core/Classes/Routing/PageRouter.php	(date 1573487360406)
-+++ public/typo3/sysext/core/Classes/Routing/PageRouter.php	(date 1573487360406)
-@@ -332,6 +332,23 @@
+--- public/typo3/sysext/core/Classes/Routing/PageRouter.php	(date 1582898440698)
++++ public/typo3/sysext/core/Classes/Routing/PageRouter.php	(date 1582898440698)
+@@ -367,6 +367,23 @@
          return $uri;
      }
  
@@ -29,7 +29,7 @@ Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
      /**
       * Check for records in the database which matches one of the slug candidates.
       *
-@@ -350,11 +367,13 @@
+@@ -387,11 +404,13 @@
              ->removeAll()
              ->add(GeneralUtility::makeInstance(DeletedRestriction::class))
              ->add(GeneralUtility::makeInstance(FrontendWorkspaceRestriction::class, null, null, $searchLiveRecordsOnly));
@@ -37,7 +37,7 @@ Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
 +        //restrict query to sites in rootline
 +        $uids = $this->getRecursivePageUIDs($this->site->getRootPageId());
          $statement = $queryBuilder
-             ->select('uid', 'l10n_parent', 'pid', 'slug')
+             ->select('uid', 'l10n_parent', 'pid', 'slug', 'mount_pid', 'mount_pid_ol', 't3ver_state', 'doktype')
              ->from('pages')
              ->where(
 +                $queryBuilder->expr()->in('uid',$uids),
